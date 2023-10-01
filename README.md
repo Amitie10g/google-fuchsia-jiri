@@ -2,23 +2,31 @@
 This project brings [Jiri](https://fuchsia.googlesource.com/jiri/) and CIPD tools from Google, and required dependencies, into a Debian-based Docker image, specifically, to download the [Google Fuchsia](https://fuchsia.dev/) source tree, as well for building it.
 
 ## Usage
-You need to define the Google Fuchsia source tree and [Ccache](https://ccache.dev/) persistent host-side directories:
+You need to define the Google Fuchsia source tree and [Ccache](https://ccache.dev/) persistent host-side directories.
 
+The default command is ``shell`` that brings Bash interactive shell.
 ```
-docker run -v <ccache dir>:/root/.cache/ccache -v <fuchsia dir>:/fuchsia amitie10g/google-fuchsia-jiri
+docker run -it -v <ccache dir>:/root/.cache/ccache -v <fuchsia dir>:/fuchsia amitie10g/google-fuchsia-jiri
 ```
 
-The default command is ``shell`` that brings Bash interactive shell. Other command are:
+Other command are:
 
-* ``update`` updates the Fuchsia source tree.<br>It first runs ``cipd auth-login`` in order to get the source that require authentication, so you need an interactive shell.
+* ``update`` updates the Fuchsia source tree. Use this the first time you run this container.<br>It first runs ``cipd auth-login`` in order to get the source that require authentication, so you need TTY.
+  ```
+  docker run -t -v <fuchsia dir>:/fuchsia amitie10g/google-fuchsia-jiri update
+  ```
 
-* ``build`` builds Fuchsia. It runs:
+* ``build`` builds Fuchsia.
+  ```
+  docker run -v <ccache dir>:/root/.cache/ccache -t -v <fuchsia dir>:/fuchsia amitie10g/google-fuchsia-jiri build
+  ```
+  It runs:
   * ``fx set workstation.x64 --with //bundles:kitchen_sink --ccache`` 
   * ``fx metrics disable``
   * ``fx build``
 
 * ``install`` install Fuchsia into a device<br>You need to specify the device at environment (defined at the Dockerfile).
-
+  
 ## Environment variables
 * ``FUCHSIA_DIR`` the Fuchsia root directory (defaults ``/fuchsia``)
 * ``PRODUCT`` the product target (defaults ``workstation``)
